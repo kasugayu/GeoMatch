@@ -15,7 +15,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
+    },
+    "ios": {
+        "infoPlist": {
+          "NSLocationWhenInUseUsageDescription": "アプリが使用中に位置情報を取得します",
+          "NSLocationAlwaysAndWhenInUseUsageDescription": "バックグラウンドで位置情報を取得します",
+          "UIBackgroundModes": ["location"]
+        }
     },
     "web": {
       "bundler": "metro",

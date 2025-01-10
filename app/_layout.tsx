@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, Button } from 'react-native';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
+const LOCATION_TASK_NAME = "background-location-task";
 
 export default function App() {
   const [location, setLocation] = useState<Location.LocationObject>();
@@ -41,3 +43,42 @@ export default function App() {
     </View>
   );
 }
+type LocationData = {
+    locations: Array<{
+      coords: {
+        latitude: number;
+        longitude: number;
+        altitude?: number;
+        speed?: number;
+        accuracy?: number;
+      };
+      timestamp: number;
+    }>;
+  };
+
+// バックグラウンドタスクの定義
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    if (data) {
+      const { locations } = data as LocationData;
+      console.log("バックグラウンド位置情報:", locations);
+    }
+  });
+  
+  // バックグラウンド位置情報の取得を開始
+  const startBackgroundLocation = async () => {
+    const { status } = await Location.requestBackgroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.error("バックグラウンド位置情報の権限がありません");
+      return;
+    }
+  
+    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+      accuracy: Location.Accuracy.High,
+      distanceInterval: 10, // 10メートルごとに更新
+      deferredUpdatesInterval: 60000, // 1分ごとにバッチで送信
+    });
+  }
